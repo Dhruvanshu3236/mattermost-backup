@@ -23,8 +23,7 @@ auth_token = r.headers.get("Token")
 
 hed = {'Authorization': 'Bearer ' + auth_token}
 
-team_name = "upforcetech"
-channel_name = "test-backup"
+channel_name = "qa-team"
 
 
 
@@ -48,7 +47,7 @@ def get_channel_id():
 
 
 
-    team_url_1 = url+'/api/v4/channels/'+channel_id+'/posts?per_page=1000&include_deleted=true'
+    team_url_1 = url+'/api/v4/channels/'+channel_id+'/posts?per_page=100000000&include_deleted=true'
     response = requests.get(team_url_1, headers=hed)
     info = response.json()
     get_all_post_info(info)
@@ -62,7 +61,8 @@ def get_all_post_info(info):
     for i, v in info['posts'].items():
 
 
-        user_url = url + f'/api/v4/users/{user_id}'
+       
+        user_url = url + f'/api/v4/users/{v["user_id"]}'
         response = requests.get(user_url, headers=hed)
         user_info = response.json()
 
@@ -98,21 +98,22 @@ def save_all_message_file(data):
             info = response.json()
 
 
-            if info != [] or 'id':
-                file_val = 1 
-                for x in info:
-                    id = x['id']
+            try:
+                if info != [] or 'id':
+                    file_val = 1 
+                    for x in info:
+                        id = x['id']
 
-                    file_url = url+'/api/v4/files/'+id
-                    response = requests.get(file_url, headers=hed, )
-                    name = response.headers.get('content-type')
+                        file_url = url+'/api/v4/files/'+id
+                        response = requests.get(file_url, headers=hed, )
 
-                    path_full = channel_name+'/'+str(i)
+                        path_full = channel_name+'/'+str(i)
 
-                    open(os.path.join(path_full, str(str(file_val)+str(info[0]['name']))), 'wb').write(response.content)
+                        open(os.path.join(path_full, str(str(file_val)+str(info[0]['name']))), 'wb').write(response.content)
 
-                    file_val += 1
-
+                        file_val += 1
+            except:
+                pass
 
 def create_csv_for_message(date, content):
 
